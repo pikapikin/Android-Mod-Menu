@@ -19,6 +19,18 @@
 #include "dobby.h"
 
 int scoreMul = 1, coinsMul = 1;
+// Tambahkan ini
+bool isAtkSpeedMod = false;
+float (*old_GetNextAtkTime)(void *instance, int aspd);
+
+// Fungsi hook-nya
+float hook_GetNextAtkTime(void *instance, int aspd) {
+    if (isAtkSpeedMod) {
+        return 0.01f; // Nilai delay serangan (semakin kecil, semakin cepat)
+    }
+    return old_GetNextAtkTime(instance, aspd);
+}
+
 
 // Do not change or translate the first text unless you know what you are doing
 // Assigning feature numbers is optional. Without it, it will automatically count for you, starting from 0
@@ -75,7 +87,9 @@ jobjectArray GetFeatureList(JNIEnv *env, jobject context) {
                       "This is WebView, with REAL HTML support!"
                       "<div style=\"background-color: darkblue; text-align: center;\">Support CSS</div>"
                       "<marquee style=\"color: green; font-weight:bold;\" direction=\"left\" scrollamount=\"5\" behavior=\"scroll\">This is <u>scrollable</u> text</marquee>"
-                      "</body></html>")
+                      "</body></html>"), 
+                      // TAMBAHKAN BARIS INI DI SINI:
+            OBFUSCATE("999_Toggle_Insta Attack Speed") 
     };
 
     int Total_Feature = (sizeof features / sizeof features[0]);
@@ -188,6 +202,13 @@ void Changes(JNIEnv *env, jclass clazz, jobject obj, jint featNum, jstring featN
                 INST(targetLibName, "_example__sym", "AnyNameForDetect3", false);
             }
             break;
+
+        // --- PASTE DI SINI ---
+        case 999:
+            isAtkSpeedMod = boolean;
+            break;
+        // ---------------------
+
         default:
             break;
     }
@@ -259,6 +280,9 @@ void hack_thread() {
     //HOOK_NO_ORIG("libFileC.so", "_example__sym", FunctionExample);
 
     //PATCH(targetLibName, "0x10709AC", "E05F40B2C0035FD6");
+    
+// PASTE DI SINI:
+    HOOK(targetLibName, "0x1FD52FC", hook_GetNextAtkTime, old_GetNextAtkTime);
 
     INST(targetLibName, "0x23558C", "AnyNameForDetect", true);
 
