@@ -8,9 +8,9 @@ jobs:
       - name: Setup NDK
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r21e # NDK yang cocok dengan template LGL
+          ndk-version: r21e
       - name: Build with ndk-build
-        run: ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./jni/Android.mk APP_PLATFORM=android-21
+        run: ndk-build -C jni NDK_PROJECT_PATH=. APP_PLATFORM=android-21
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
